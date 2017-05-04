@@ -156,7 +156,7 @@ void createFractal
                 -> left shift green index by 8 bits, blue index by 16
             */
 
-            fractal_points[px][py][1] = ((index_r) + (index_g << 8) + (index_b << 16));
+            fractal_points[px][py][0] = ((index_r) + (index_g << 8) + (index_b << 16));
 
             iter_count = 0; 
             dist = 0;
@@ -188,7 +188,7 @@ void drawFractal(Display *display, Window *window, GC *gc, unsigned long fractal
           {
             /* Set foreground color to <fractal_points> value */
 
-            XSetForeground(display, *gc, fractal_points[x][y][1]);
+            XSetForeground(display, *gc, fractal_points[x][y][0]);
 
             /* Color pixel at the specified (x,y) coordinate in window */
 
