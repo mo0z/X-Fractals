@@ -156,7 +156,7 @@ void createFractal
                 -> left shift green index by 8 bits, blue index by 16
             */
 
-            fractal_points[px][py][0] = ((index_r) + (index_g << 8) + (index_b << 16));
+            fractal_points[px][py][0] = ((index_r) + (index_g << 4) + (index_b << 8));
 
             iter_count = 0; 
             dist = 0;
