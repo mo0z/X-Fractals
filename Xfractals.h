@@ -14,8 +14,8 @@
     -> define width and height of new fractal window
 */
 
-#define WIDTH  250
-#define HEIGHT 250
+#define WIDTH  400
+#define HEIGHT 400
 
 /* GENERAL FUNCTION PROTOTYPES */
 
