@@ -47,11 +47,7 @@ void createFractal
     /* <*fractalRoutine>, pointer to a function body  */
     /* <*fractalColorRoutine>, pointer to a function body  */
 
-    void    (*fractalRoutine)(double, double, double *, double *, double, double, double, double),
-            calculateMandelbrot(), 
-            calculateJulia(),
-            calculateLambda();
-
+    void          (*fractalRoutine)(double, double, double *, double *, double, double, double, double);
     unsigned long (*fractalColorRoutine)(int, int, int);
 
     double  dist_max,
@@ -109,7 +105,7 @@ void createFractal
           imag = 0.6;
         break;
         case 3:
-          fractalRoutine = &calculateLambda;
+          fractalRoutine = &calculateSpiral;
           dist_max = 4.0;
           real = 0.85;
           imag = 0.6;
@@ -365,7 +361,7 @@ void calculateJulia
     return;
   }
 
-void calculateLambda
+void calculateSpiral
 (double xn, double yn, double *xnew, double *ynew, 
  double orig1, double orig2, double real, double imag)
   {
