@@ -20,25 +20,39 @@
 #define ITER_MAX 155
 
 /* Define local function prototypes ... */
+/* TODO: put these in a separate library header file */
+
 void getNewBounds(int, int, int, int, int, double *, double *, double *, double *);
 void calculateMandelbrot(double, double, double *, double *, double, double, double, double);
 void calculateJulia(double, double, double *, double *, double, double, double, double);
 void calculateSpiral(double, double, double *, double *, double, double, double, double);
+/* TODO: refactor color routines as void to improve performance */
+unsigned long calculateColorBanded(int, int, int);
+unsigned long calculateColorBlueDark(int, int, int);
+unsigned long calculateColorPurpleDark(int, int, int);
+unsigned long calculateColorBlueLight(int, int, int);
+unsigned long calculateColorRedDark(int, int, int);
+unsigned long calculateColorGreenLight(int, int, int);
+unsigned long calculateColorGreenBanded(int, int, int);
+unsigned long calculateColorBlueGreenBanded(int, int, int);
 
 /*
   Function createFractal
    -> Generate/store pixel color data for a given fractal and region ...
 */
 void createFractal
- (int fractal_type, unsigned long fractal_points[][HEIGHT][1], 
+ (int fractal_type, int fractal_color, unsigned long fractal_points[][HEIGHT][1], 
   int px1, int py1, int px2, int py2)
   {
-    /* <*Routine>, pointer to a function body  */
+    /* <*fractalRoutine>, pointer to a function body  */
+    /* <*fractalColorRoutine>, pointer to a function body  */
 
-    void    (*Routine)(double, double, double *, double *, double, double, double, double),
+    void    (*fractalRoutine)(double, double, double *, double *, double, double, double, double),
             calculateMandelbrot(), 
             calculateJulia(),
             calculateLambda();
+
+    unsigned long (*fractalColorRoutine)(int, int, int);
 
     double  dist_max,
             real, 
@@ -77,30 +91,59 @@ void createFractal
                   index_g,
                   index_b;
 
-    /* Set appropriate values based on user fractal choice ... */
+    /* Set appropriate values based on user choices ... */
 
     switch(fractal_type) 
       {
         case 1:
           /* Assign the function pointer to a function body */
-          Routine = &calculateMandelbrot;
+          fractalRoutine = &calculateMandelbrot;
           dist_max = 2.0;
           real = 0.0;
           imag = 0.0;
         break;
         case 2:
-          Routine = &calculateJulia;
+          fractalRoutine = &calculateJulia;
           dist_max = 2.0;
           real = 0.3;
           imag = 0.6;
         break;
         case 3:
-          Routine = &calculateLambda;
+          fractalRoutine = &calculateLambda;
           dist_max = 4.0;
           real = 0.85;
           imag = 0.6;
         break;
-      }       
+      }
+
+    switch(fractal_color) 
+      {
+        case 1:
+          /* Assign the function pointer to a function body */
+          fractalColorRoutine = &calculateColorBanded;
+        break;
+        case 2:
+          fractalColorRoutine = &calculateColorBlueDark;
+        break;
+        case 3:
+          fractalColorRoutine = &calculateColorPurpleDark;
+        break;
+        case 4:
+          fractalColorRoutine = &calculateColorBlueLight;
+        break;
+        case 5:
+          fractalColorRoutine = &calculateColorRedDark;
+        break;
+        case 6:
+          fractalColorRoutine = &calculateColorGreenLight;
+        break;
+        case 7:
+          fractalColorRoutine = &calculateColorGreenBanded;
+        break;
+        case 8:
+          fractalColorRoutine = &calculateColorBlueGreenBanded;
+        break;
+      }
 
     /* Determine fractal bounds ... */
 
@@ -127,7 +170,7 @@ void createFractal
             while ((iter_count <= ITER_MAX) && (dist < dist_max))
               {
                 /* Call specified fractal routine */
-                Routine(xn, yn, &xnew, &ynew, orig1, orig2, real, imag);
+                fractalRoutine(xn, yn, &xnew, &ynew, orig1, orig2, real, imag);
 
                 xn = xnew;
                 yn = ynew;
@@ -153,10 +196,8 @@ void createFractal
             /* 
               Build a 24-bit long unsigned value from the color triplets ...
                 -> required by a TrueColor visual type to render color!
-                -> left shift green index by 8 bits, blue index by 16
             */
-
-            fractal_points[px][py][0] = ((index_r) + (index_g << 4) + (index_b << 8));
+            fractal_points[px][py][0] = fractalColorRoutine(index_r, index_g, index_b);
 
             iter_count = 0; 
             dist = 0;
@@ -332,4 +373,52 @@ void calculateLambda
     *ynew = ((real * yn) + (imag * xn) - (imag * xn * xn) + (imag * yn * yn) - (2 * real * xn * yn));
 
     return;
+  }
+
+unsigned long calculateColorBanded
+(int index_red, int index_green, int index_blue)
+  {
+    return (index_red + (index_green << 4) + (index_blue << 8));
+  }
+
+unsigned long calculateColorBlueDark
+(int index_red, int index_green, int index_blue)
+  {
+    return (index_red + index_green + index_blue);
+  }
+
+unsigned long calculateColorPurpleDark
+(int index_red, int index_green, int index_blue)
+  {
+    return (index_red + index_green + (index_blue << 16));
+  }
+
+unsigned long calculateColorBlueLight
+(int index_red, int index_green, int index_blue)
+  {
+    return (index_red + index_green + (index_blue << 8));
+  }
+
+unsigned long calculateColorRedDark
+(int index_red, int index_green, int index_blue)
+  {
+    return ((index_red + index_green + index_blue) << 16);
+  }
+
+unsigned long calculateColorGreenLight
+(int index_red, int index_green, int index_blue)
+  {
+    return ((index_red + index_green + index_blue) << 8);
+  }
+
+unsigned long calculateColorGreenBanded
+(int index_red, int index_green, int index_blue)
+  {
+    return ((index_red + index_green + index_blue) << 12);
+  }
+
+unsigned long calculateColorBlueGreenBanded
+(int index_red, int index_green, int index_blue)
+  {
+    return ((65000 * (0.01 * index_red)) + (65000 * (0.01 * index_green)) + (65000 * (0.01 * index_blue)));
   }

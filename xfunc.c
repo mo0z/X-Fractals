@@ -136,7 +136,8 @@ void createWindow
     -> Show window and wait for user input
 */
 void showWindow
- (Display *display, int screen, Window *window, GC *gc, unsigned long fractal_points[][HEIGHT][1], int fractal_type)
+ (Display *display, int screen, Window *window, GC *gc, 
+  unsigned long fractal_points[][HEIGHT][1], int fractal_type, int fractal_color)
   {
     int px1,
         px2,
@@ -218,7 +219,7 @@ void showWindow
 
                   /* create new data and redraw */
 
-                  createFractal(fractal_type, fractal_points, px1, py1, px2, py2);
+                  createFractal(fractal_type, fractal_color, fractal_points, px1, py1, px2, py2);
                   drawFractal(display, window, gc, fractal_points);
                 }
             break;
